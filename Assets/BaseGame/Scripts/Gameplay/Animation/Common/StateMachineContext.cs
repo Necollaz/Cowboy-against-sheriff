@@ -1,20 +1,21 @@
 using UnityEngine;
 using UnityEngine.AI;
 using BaseGame.Scripts.Gameplay.Common.Interfaces;
-using BaseGame.Scripts.Gameplay.WaypointSystem;
+using BaseGame.Scripts.Gameplay.Core.Interfaces;
+using BaseGame.Scripts.Gameplay.Waypoint;
 
 namespace BaseGame.Scripts.Gameplay.Animation.Common
 {
     public class StateMachineContext
     {
-        public WaypointMover Mover { get; }
+        public PathNavigator Mover { get; }
         public NavMeshAgent Agent { get; }
         public ICharacterAnimator Animator { get; }
-        public IBulletSpawner Spawner { get; }
+        public IAmmunitionSpawner Spawner { get; }
         public StateMachine Machine { get; set; }
         public Camera Camera { get; }
 
-        public StateMachineContext(WaypointMover mover, NavMeshAgent agent, ICharacterAnimator animator, IBulletSpawner spawner, Camera camera)
+        public StateMachineContext(PathNavigator mover, NavMeshAgent agent, ICharacterAnimator animator, IAmmunitionSpawner spawner, Camera camera)
         {
             Mover = mover;
             Agent = agent;

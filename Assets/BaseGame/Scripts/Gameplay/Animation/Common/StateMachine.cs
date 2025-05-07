@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using BaseGame.Scripts.Gameplay.Common.Enums;
 using BaseGame.Scripts.Gameplay.Common.Interfaces;
+using BaseGame.Scripts.Gameplay.Enums;
 
 namespace BaseGame.Scripts.Gameplay.Animation.Common
 {
@@ -22,7 +22,7 @@ namespace BaseGame.Scripts.Gameplay.Animation.Common
             _current.Enter();
         }
 
-        public void Update()
+        public void UpdateState()
         {
             _current?.HandleInput();
             _current?.LogicUpdate();

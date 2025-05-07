@@ -217,7 +217,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86ebb3e1ce1a40f394b61769148f8134, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _healthBarPrefab: {fileID: 526153884814493337, guid: df0253cd7e0c04e4d8b47f82196305fd, type: 3}
+  _barHeight: 2
   _attackRange: 1.5
+  _attackDamage: 10
 --- !u!114 &1219482921611342370
 MonoBehaviour:
   m_ObjectHideFlags: 0
