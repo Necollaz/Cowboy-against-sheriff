@@ -1,4 +1,4 @@
-namespace BaseGame.Scripts.Gameplay.Common.Interfaces
+namespace BaseGame.Scripts.Gameplay.Core.Interfaces
 {
     public interface IDamageable
     {

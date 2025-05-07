@@ -1,16 +1,15 @@
 using System.Collections.Generic;
-using BaseGame.Scripts.Gameplay.Common.Interfaces;
 using BaseGame.Scripts.Gameplay.Enums;
 
 namespace BaseGame.Scripts.Gameplay.Animation.Common
 {
     public class StateMachine
     {
-        private readonly Dictionary<StateType, IState> _states;
+        private readonly Dictionary<StateType, State> _states;
         
-        private IState _current;
+        private State _current;
 
-        public StateMachine(Dictionary<StateType, IState> states)
+        public StateMachine(Dictionary<StateType, State> states)
         {
             _states = states;
         }

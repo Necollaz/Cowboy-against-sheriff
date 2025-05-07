@@ -1,13 +1,13 @@
+using UnityEngine;
 using BaseGame.Scripts.Gameplay.Animation.Common;
-using BaseGame.Scripts.Gameplay.Common.Interfaces;
 
 namespace BaseGame.Scripts.Gameplay.Animation.AnimatorComponents
 {
-    public class CharacterAnimator : ICharacterAnimator
+    public class CharacterAnimator
     {
-        private readonly UnityEngine.Animator _animator;
+        private readonly Animator _animator;
 
-        public CharacterAnimator(UnityEngine.Animator animator) => _animator = animator;
+        public CharacterAnimator(Animator animator) => _animator = animator;
 
         public void PlayIdle()
         {

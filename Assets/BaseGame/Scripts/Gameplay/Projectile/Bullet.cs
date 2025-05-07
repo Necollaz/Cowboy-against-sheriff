@@ -1,8 +1,8 @@
+using System;
 using System.Collections;
 using UnityEngine;
-using BaseGame.Scripts.Gameplay.Common.Interfaces;
 using BaseGame.Scripts.Gameplay.Configuration;
-using BaseGame.Scripts.Gameplay.Pooling;
+using BaseGame.Scripts.Gameplay.Core.Interfaces;
 
 namespace BaseGame.Scripts.Gameplay.Projectile
 {
@@ -10,50 +10,55 @@ namespace BaseGame.Scripts.Gameplay.Projectile
     [RequireComponent(typeof(Rigidbody))]
     public class Bullet : MonoBehaviour
     {
-        private BulletConfig _config;
-        private ObjectPool<Bullet> _pool;
         private Rigidbody _rigidbody;
+        private Coroutine _lifeCoroutine;
+        
         private float _lifeTime;
+        private float _damage;
+        
+        public event Action<Bullet> Finished;
 
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
         }
 
-        public void Initialize(ObjectPool<Bullet> pool, BulletConfig config, Vector3 spawnPosition, Vector3 direction)
+        public void Initialize(BulletConfig config, Vector3 direction)
         {
-            _pool = pool;
-            _config = config;
-            _lifeTime = _config.LifeTime;
-            transform.position = spawnPosition;
+            _damage = config.Damage;
+            _lifeTime = config.LifeTime;
+            
+            gameObject.SetActive(true);
 
-            transform.gameObject.SetActive(true);
-            
             _rigidbody.velocity = direction.normalized * config.Speed;
-            
-            StartCoroutine(LifeTimer());
+            _lifeCoroutine = StartCoroutine(LifeTimer());
         }
 
         private IEnumerator LifeTimer()
         {
             yield return new WaitForSeconds(_lifeTime);
             
-            ReturnToPool();
+            Finish();
         }
 
         private void OnCollisionEnter(Collision collision)
         {
             if (collision.gameObject.TryGetComponent(out IDamageable target))
-                target.TakeDamage(_config.Damage);
+                target.TakeDamage(_damage);
             
-            ReturnToPool();
+            Finish();
         }
 
-        private void ReturnToPool()
+        private void Finish()
         {
-            StopAllCoroutines();
+            if (_lifeCoroutine != null)
+            {
+                StopCoroutine(_lifeCoroutine); _lifeCoroutine = null;
+            }
             
-            _pool.Return(this);
+            Finished?.Invoke(this);
+            
+            gameObject.SetActive(false);
         }
     }
 }

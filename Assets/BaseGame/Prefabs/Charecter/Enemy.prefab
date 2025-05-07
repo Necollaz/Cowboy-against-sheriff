@@ -79,6 +79,9 @@ GameObject:
   - component: {fileID: 2201385307050566859}
   - component: {fileID: 1890256866587604107}
   - component: {fileID: 1219482921611342370}
+  - component: {fileID: 4221343997366306645}
+  - component: {fileID: 6109516966214182734}
+  - component: {fileID: 1499029545407893246}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -217,10 +220,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86ebb3e1ce1a40f394b61769148f8134, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _healthBarPrefab: {fileID: 526153884814493337, guid: df0253cd7e0c04e4d8b47f82196305fd, type: 3}
-  _barHeight: 2
-  _attackRange: 1.5
-  _attackDamage: 10
 --- !u!114 &1219482921611342370
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -234,6 +233,46 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxHealth: 100
+--- !u!114 &4221343997366306645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1045401375514670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7394f4023614e9b8341a8dc8a3d64d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _attackRange: 1.5
+--- !u!114 &6109516966214182734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1045401375514670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29582b9963874b94a67cb22148f58ae8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _attackDamage: 10
+--- !u!114 &1499029545407893246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1045401375514670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6a2a98ef9a64beeb5b0156abfc0abad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _barPrefab: {fileID: 526153884814493337, guid: df0253cd7e0c04e4d8b47f82196305fd, type: 3}
+  _barHeight: 2
 --- !u!1 &1063867024875804
 GameObject:
   m_ObjectHideFlags: 0

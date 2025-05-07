@@ -5,8 +5,8 @@ using UnityEngine.SceneManagement;
 using BaseGame.Scripts.Gameplay.Animation.AnimatorComponents;
 using BaseGame.Scripts.Gameplay.Animation.Behaviors;
 using BaseGame.Scripts.Gameplay.Animation.Common;
-using BaseGame.Scripts.Gameplay.Common.Interfaces;
 using BaseGame.Scripts.Gameplay.Configuration;
+using BaseGame.Scripts.Gameplay.Enemy;
 using BaseGame.Scripts.Gameplay.Enums;
 using BaseGame.Scripts.Gameplay.Health;
 using BaseGame.Scripts.Gameplay.Projectile;
@@ -23,7 +23,7 @@ namespace BaseGame.Scripts.Gameplay.Waypoint
 
         private NavMeshAgent _agent;
         private StateMachine _machine;
-        private StateMachineContext _stateMachineContext;
+        private StateMachineContext _context;
         private BulletSpawner _spawner;
         private HealthComponent _playerHealth;
         private Camera _camera;
@@ -33,30 +33,37 @@ namespace BaseGame.Scripts.Gameplay.Waypoint
         public WaypointData CurrentData => _container.WaypointsData[_currentIndex];
         public Vector3 NextPosition => _container.WaypointsData[_currentIndex + 1].Waypoint.position;
         public Transform MuzzlePoint => _muzzlePoint;
-        public List<IEnemyEntity> CurrentEnemies { get; } = new List<IEnemyEntity>();
-        public int CurrentIndex => _currentIndex;
-        public float Speed => _agent.speed;
+        public List<EnemyEntity> CurrentEnemies { get; } = new List<EnemyEntity>();
         public bool HasNextWaypoint => _currentIndex + 1 < _container.WaypointsData.Length;
+        public float Speed => _agent.speed;
+        public int CurrentIndex => _currentIndex;
 
         private void Awake()
         {
             _agent = GetComponent<NavMeshAgent>();
             _playerHealth = GetComponent<HealthComponent>();
+            
             _camera = Camera.main;
 
             _spawner = new BulletSpawner(_bulletPrefab, _muzzlePoint, _bulletConfig);
-            _stateMachineContext = new StateMachineContext(this, _agent, new CharacterAnimator(GetComponent<Animator>()), _spawner, _camera);
+            _context = new StateMachineContext(this, _agent, new CharacterAnimator(GetComponent<Animator>()), _spawner, _camera);
 
-            Dictionary<StateType, IState> states = new Dictionary<StateType, IState> { { StateType.Idle, new IdleBehavior(_stateMachineContext) }, { StateType.Move, new MoveBehavior(_stateMachineContext) }, { StateType.Attack, new AttackBehavior(_stateMachineContext) } };
-
+            Dictionary<StateType, State> states = new Dictionary<StateType, State>
+            {
+                { StateType.Idle, new IdleBehavior(_context) },
+                { StateType.Move, new MoveBehavior(_context) },
+                { StateType.Attack, new AttackBehavior(_context) }
+            };
+            
             _machine = new StateMachine(states);
-            _stateMachineContext.Machine = _machine;
+            _context.Machine = _machine;
         }
 
         private void Start()
         {
             _currentIndex = 0;
             transform.position = _container.WaypointsData[0].Waypoint.position;
+            
             _machine.ChangeState(StateType.Idle);
         }
 
@@ -68,17 +75,17 @@ namespace BaseGame.Scripts.Gameplay.Waypoint
         public void OnReachWaypoint()
         {
             _currentIndex++;
-            
+
             if (_currentIndex >= _container.WaypointsData.Length - 1)
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-                
+
                 return;
             }
 
             CurrentEnemies.Clear();
 
-            foreach(Enemy.EnemyEntity enemy in _container.WaypointsData[_currentIndex].Enemies)
+            foreach (EnemyEntity enemy in _container.WaypointsData[_currentIndex].Enemies)
             {
                 CurrentEnemies.Add(enemy);
                 enemy.Initialize(transform, _playerHealth);

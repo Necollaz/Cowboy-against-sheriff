@@ -1,92 +1,57 @@
 using System;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.AI;
 using UnityEngine.SceneManagement;
-using BaseGame.Scripts.Gameplay.Common.Interfaces;
+using BaseGame.Scripts.Gameplay.Core.Interfaces;
 using BaseGame.Scripts.Gameplay.Health;
-using BaseGame.Scripts.Gameplay.Ragdoll;
-using UnityEngine.Serialization;
 
 namespace BaseGame.Scripts.Gameplay.Enemy
 {
-    [RequireComponent(typeof(Animator))]
-    [RequireComponent(typeof(NavMeshAgent))]
-    [RequireComponent(typeof(RagdollEnabler))]
-    [RequireComponent(typeof(HealthComponent))]
+    [RequireComponent(typeof(EnemyRangeMover))]
+    [RequireComponent(typeof(EnemyMeleeAttacker))]
+    [RequireComponent(typeof(EnemyHealthPresenter))]
     public class EnemyEntity : MonoBehaviour, IEnemyEntity
     {
-        private const string AttackName = "AttackEnemy";
-
-        [FormerlySerializedAs("_healthBarPrefab")] [SerializeField] private HealthBarView _healthBarViewPrefab;
-        [SerializeField] private float _barHeight = 2f;
-        [SerializeField] private float _attackRange = 1.5f;
-        [SerializeField] private float _attackDamage = 10f;
-
-        private RangeFollower _iMovement;
-        private MeleeAttacker _iAttackCooldown;
-        private RagdollEnabler _ragdoll;
-        private HealthComponent _healthEnemy;
-        private HealthBarView _healthBarViewInstance;
-        private HealthLifecycle _healthLifecycle;
+        private EnemyRangeMover _rangeMover;
+        private EnemyMeleeAttacker _meleeAttacker;
+        private EnemyHealthPresenter _healthPresenter;
         private HealthComponent _playerHealth;
-
-        private Animator _animator;
-        private NavMeshAgent _agent;
+        private HealthComponent _selfHealth;
         private Transform _playerTransform;
+        private Animator _animator;
 
-        private Action _onEnemyDeath;
-        private Action _onPlayerDeath;
-
-        public bool IsDead => _healthLifecycle.IsDead;
-
+        public bool IsDead => _selfHealth.IsDead;
         public event Action<IEnemyEntity> Death;
 
         private void Awake()
         {
+            _selfHealth = GetComponent<HealthComponent>();
             _animator = GetComponent<Animator>();
-            _agent = GetComponent<NavMeshAgent>();
-            _ragdoll = GetComponent<RagdollEnabler>();
-            _healthEnemy = GetComponent<HealthComponent>();
+            _rangeMover = GetComponent<EnemyRangeMover>();
+            _meleeAttacker = GetComponent<EnemyMeleeAttacker>();
+            _healthPresenter = GetComponent<EnemyHealthPresenter>();
 
-            Vector3 barPosition = transform.position + Vector3.up * _barHeight;
-            _healthBarViewInstance = Instantiate(_healthBarViewPrefab, barPosition, Quaternion.identity, transform);
-            _healthLifecycle = new HealthLifecycle(_healthEnemy, _healthBarViewInstance, _ragdoll, _agent);
-
-            _onEnemyDeath = () => Death?.Invoke(this);
-            _healthLifecycle.Death += _onEnemyDeath;
-
-            _iMovement = new RangeFollower(_attackRange);
-
-            AnimationClip clip = _animator.runtimeAnimatorController.animationClips.FirstOrDefault(clip => clip.name == AttackName);
-
-            float attackDuration = clip?.length ?? 1f;
-            _iAttackCooldown = new MeleeAttacker();
-            _iAttackCooldown.Initialize(_animator, _attackRange, _attackDamage, attackDuration);
-            _agent.enabled = false;
+            _healthPresenter.Death += OnDeathInternal;
         }
 
         private void Update()
         {
-            if(_playerTransform == null || _healthLifecycle.IsDead)
+            if (_playerTransform == null)
                 return;
 
-            _iAttackCooldown.UpdateCooldown();
-            _iMovement.UpdateMovement();
+            _rangeMover.Tick();
 
-            if(_iAttackCooldown.CanAttack && _iMovement.IsInRange)
-                _iAttackCooldown.TryAttack(transform, _playerHealth);
+            if (_rangeMover.IsInRange)
+            {
+                _meleeAttacker.Tick(transform);
+            }
         }
 
         private void OnDestroy()
         {
-            if(_healthLifecycle != null && _onEnemyDeath != null)
-                _healthLifecycle.Death -= _onEnemyDeath;
+            _healthPresenter.Death -= OnDeathInternal;
 
-            _healthLifecycle?.Dispose();
-
-            if(_playerHealth != null && _onPlayerDeath != null)
-                _playerHealth.Death -= _onPlayerDeath;
+            if (_playerHealth != null)
+                _playerHealth.Death -= OnPlayerDeath;
         }
 
         public void Initialize(Transform playerTransform, HealthComponent playerHealth)
@@ -94,24 +59,28 @@ namespace BaseGame.Scripts.Gameplay.Enemy
             _playerTransform = playerTransform;
             _playerHealth = playerHealth;
 
-            _iMovement.Initialize(_agent, _playerTransform, _animator);
-            _onPlayerDeath = OnPlayerDeath;
-            _playerHealth.Death += _onPlayerDeath;
+            _rangeMover.Initialize(playerTransform);
+
+            _meleeAttacker.Initialize(_animator, _rangeMover.AttackRange, _playerHealth);
+
+            _playerHealth.Death += OnPlayerDeath;
         }
 
         public void Activate()
         {
-            _agent.enabled = true;
-            _agent.isStopped = false;
-            _agent.SetDestination(_playerTransform.position);
-
-            _healthBarViewInstance.Setup(_healthEnemy.MaxHealth);
+            _rangeMover.enabled = true;
+            _meleeAttacker.enabled = true;
         }
 
         public void OnAttackHit()
         {
-            if(!IsDead && !_playerHealth.IsDead)
-                _playerHealth.TakeDamage(_attackDamage);
+            if (!_playerHealth.IsDead)
+                _playerHealth.TakeDamage(_meleeAttacker.CanAttack ? 10f : 0f);
+        }
+        
+        private void OnDeathInternal()
+        {
+            Death?.Invoke(this);
         }
 
         private void OnPlayerDeath()
