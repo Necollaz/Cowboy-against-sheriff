@@ -11,19 +11,26 @@ namespace BaseGame.Scripts.Gameplay.Health
         private float _health;
 
         public event Action Death;
+        public event Action<float, float> HealthChanged;
         
-        private void Awake() => _health = _maxHealth;
-
-        public bool IsDead => _health <= 0;
+        public float CurrentHealth => _health;
+        public float MaxHealth => _maxHealth;
+        public bool IsDead => _health <= 0f;
+        
+        private void Awake()
+        {
+            _health = _maxHealth;
+        }
 
         public void TakeDamage(float amount)
         {
-            if(IsDead)
-                return;
-            
-            _health -= amount;
+            if (IsDead) return;
 
-            if(_health <= 0)
+            _health = Mathf.Max(0f, _health - amount);
+            
+            HealthChanged?.Invoke(_health, _maxHealth);
+
+            if (_health <= 0f)
                 Death?.Invoke();
         }
     }

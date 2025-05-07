@@ -159,9 +159,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _container: {fileID: 0}
-  _bulletConfig: {fileID: 11400000, guid: f56de022abd1444e69df8c01e1736f90, type: 2}
-  _bulletPrefab: {fileID: 9150792349971519711, guid: 296b6c6ad62626c48aef7fa6c5e2a9a8, type: 3}
-  _muzzlePoint: {fileID: 3558431279843089497}
+  _bulletConfig: {fileID: 0}
+  _bulletPrefab: {fileID: 0}
+  _muzzlePoint: {fileID: 0}
 --- !u!114 &2639305260342013945
 MonoBehaviour:
   m_ObjectHideFlags: 0
