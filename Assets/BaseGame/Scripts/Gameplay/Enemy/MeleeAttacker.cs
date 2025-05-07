@@ -1,11 +1,10 @@
 using UnityEngine;
 using BaseGame.Scripts.Gameplay.Animation.Common;
-using BaseGame.Scripts.Gameplay.Common.Interfaces;
 using BaseGame.Scripts.Gameplay.Health;
 
 namespace BaseGame.Scripts.Gameplay.Enemy
 {
-    public class MeleeAttacker : IAttackCooldown
+    public class MeleeAttacker
     {
         private Animator _animator;
         private float _damage;
@@ -24,10 +23,12 @@ namespace BaseGame.Scripts.Gameplay.Enemy
 
         public void TryAttack(Transform attacker, HealthComponent targetHealth)
         {
-            if (_timer > 0f) 
+            if (_timer > 0f)
                 return;
             
             _animator.SetTrigger(AnimationIDs.AttackEnemy);
+            targetHealth.TakeDamage(_damage);
+            
             _timer = _cooldown;
         }
 

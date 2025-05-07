@@ -1,10 +1,9 @@
 using UnityEngine;
-using BaseGame.Scripts.Gameplay.Core.Interfaces;
 
 namespace BaseGame.Scripts.Gameplay.Ragdoll
 {
     [RequireComponent(typeof(Animator))]
-    public class RagdollEnabler : MonoBehaviour, IRagdollActivator
+    public class RagdollEnabler : MonoBehaviour
     {
         [SerializeField] private Collider[] _ragdollColliders;
         [SerializeField] private Rigidbody[] _ragdollBodies;
@@ -22,7 +21,7 @@ namespace BaseGame.Scripts.Gameplay.Ragdoll
                 enemyRigidbody.isKinematic = true;
         }
 
-        public void ActivateRagdoll()
+        public void Activate()
         {
             _animator.enabled = false;
             

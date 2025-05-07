@@ -1,14 +1,13 @@
 using UnityEngine;
 using UnityEngine.AI;
 using BaseGame.Scripts.Gameplay.Animation.Common;
-using BaseGame.Scripts.Gameplay.Common.Interfaces;
 
 namespace BaseGame.Scripts.Gameplay.Enemy
 {
-    public class RangeFollower : IMovement
+    public class RangeFollower
     {
         private readonly float _attackRange;
-        
+
         private NavMeshAgent _agent;
         private Transform _target;
         private Animator _animator;
@@ -28,24 +27,38 @@ namespace BaseGame.Scripts.Gameplay.Enemy
             _agent = agent;
             _target = target;
             _animator = animator;
+            
+            if (!_agent.isOnNavMesh)
+            {
+                NavMeshHit hit;
+
+                if (NavMesh.SamplePosition(_agent.transform.position, out hit, 1f, NavMesh.AllAreas))
+                {
+                    _agent.Warp(hit.position);
+                }
+            }
+            
             _agent.enabled = true;
             _wasMoving = false;
         }
 
         public void UpdateMovement()
         {
+            if (!_agent.isOnNavMesh) 
+                return;
+            
             float dist = Vector3.Distance(_agent.transform.position, _target.position);
             _isInRange = dist <= _attackRange;
 
-            bool isMoving = !_isInRange;
-            
-            if(isMoving != _wasMoving)
+            bool shouldMove = !_isInRange;
+
+            if (shouldMove != _wasMoving)
             {
-                _animator.SetBool(AnimationIDs.Run, isMoving);
-                _wasMoving = isMoving;
+                _animator.SetBool(AnimationIDs.Run, shouldMove);
+                _wasMoving = shouldMove;
             }
 
-            if(isMoving)
+            if (shouldMove)
             {
                 _agent.isStopped = false;
                 _agent.SetDestination(_target.position);
@@ -60,6 +73,7 @@ namespace BaseGame.Scripts.Gameplay.Enemy
         {
             _agent.isStopped = true;
             _agent.enabled = false;
+            
             _animator.SetBool(AnimationIDs.Run, false);
             _wasMoving = false;
         }

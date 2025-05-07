@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using BaseGame.Scripts.Gameplay.Common.Interfaces;
+using BaseGame.Scripts.Gameplay.Core.Interfaces;
 
 namespace BaseGame.Scripts.Gameplay.Health
 {
@@ -9,13 +9,12 @@ namespace BaseGame.Scripts.Gameplay.Health
         [SerializeField] private float _maxHealth = 100f;
         
         private float _health;
-
-        public event Action Death;
-        public event Action<float, float> HealthChanged;
         
-        public float CurrentHealth => _health;
         public float MaxHealth => _maxHealth;
         public bool IsDead => _health <= 0f;
+        
+        public event Action Death;
+        public event Action<float, float> HealthChanged;
         
         private void Awake()
         {
@@ -24,7 +23,8 @@ namespace BaseGame.Scripts.Gameplay.Health
 
         public void TakeDamage(float amount)
         {
-            if (IsDead) return;
+            if (IsDead)
+                return;
 
             _health = Mathf.Max(0f, _health - amount);
             

@@ -4,14 +4,9 @@ namespace BaseGame.Scripts.Gameplay.Animation.Common
 {
     public class AnimationIDs
     {
-        private const string RunParam = "isRunning";
-        private const string AttackPlayerParam = "Attack";
-        private const string AttackEnemyParam = "AttackMelee";
-        private const string DeatParam = "Death";
-        
-        public static readonly int Run = Animator.StringToHash(RunParam);
-        public static readonly int AttackPlayer = Animator.StringToHash(AttackPlayerParam);
-        public static readonly int AttackEnemy = Animator.StringToHash(AttackEnemyParam);
-        public static readonly int Death = Animator.StringToHash(DeatParam);
+        public static readonly int Run = Animator.StringToHash("isRunning");
+        public static readonly int AttackPlayer = Animator.StringToHash("Attack");
+        public static readonly int AttackEnemy = Animator.StringToHash("AttackMelee");
+        public static readonly int Death = Animator.StringToHash("Death");
     }
 }
